@@ -5,13 +5,14 @@ import { fontSizes, spacing } from '../utils/sizes'
 import { RoundedButton } from '../components/RoundedButton'
 import { colors } from '../utils/colors'
 import { ProgressBar } from 'react-native-paper'
+import { Timing } from './Timing'
 
 export const Timer = ({
     currentItem,
     clearItem
 }) => {
     const [isPaused, setIsPaused] = useState(true)
-    const [initialTime, setInitialTime] = useState(0.2)
+    const [initialTime, setInitialTime] = useState(10)
     const [progress, setProgress] = useState(initialTime)
 
     const handleEnd = () => {
@@ -31,10 +32,13 @@ export const Timer = ({
             <View style={styles.progressBarContainer}>
                 <ProgressBar style={styles.progressBar} progress={progress} />
             </View>
-            <View style={styles.buttonContainer}>
+            <View style={[styles.buttonContainer, {flexDirection: isPaused ? 'row' : 'column'}]}>
                 <RoundedButton size={100} title={isPaused ? 'Start' : 'Stop'} onPress={() => {setIsPaused((isPaused) => !isPaused)}}/> 
+                {isPaused && <RoundedButton size={100} title={'Cancel'} onPress={clearItem} />}
             </View>
-            
+            <View style={styles.timeOptionsContainer}>
+                <Timing changeTime={setInitialTime}/>
+            </View>
         </View>
     )
 }
@@ -62,14 +66,19 @@ const styles = StyleSheet.create({
         color: colors.white
     },
     buttonContainer: {
-        flex:0.3,
+        flex:0.2,
         margin: spacing.xxl,
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
+        columnGap: 40
     },
     progressBarContainer: {
         paddingVertical: spacing.xxl,
     },
     progressBar:{
         height: 9,
+    },
+    timeOptionsContainer:{
+        flex: 0.4
     }
 })

@@ -25,7 +25,7 @@ const styles = (size) => ({
         borderWidth: 2
     },
     text: {
-        color: colors.white, fontSize: size / 2.7
+        color: colors.white, fontSize: size / 3.5
     }
 
 })
