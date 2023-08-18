@@ -1,17 +1,32 @@
 import { useState } from 'react';
-import { SafeAreaView, StyleSheet, Platform,  StatusBar } from 'react-native';
+import { SafeAreaView, StyleSheet, Platform,  StatusBar, View } from 'react-native';
 import { colors } from './src/utils/colors';
 import { Focus } from './src/features/Focus';
 import { Timer } from './src/features/Timer';
+import { FocusHistory } from './src/features/FocusHistory';
 
 export default function App() {
-  const [item, setItem] = useState(null)
+  const [item, setItem] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  const handleAddHistory = (itemFocused) => {
+    setHistory((prev) => [itemFocused, ...prev]);
+    setItem(null);
+  }
+
+  const handleClear = () => {
+    setItem(null);
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       {!item ? 
-        <Focus addItem={setItem}/> : 
-        <Timer currentItem={item} clearItem={() => {setItem(null)}} />
+        <>
+          <Focus addItem={setItem} /> 
+          <FocusHistory history={history} />
+        </>
+        : 
+        <Timer currentItem={item} clearItem={handleClear} addToHistory={handleAddHistory} />
       }
       
     </SafeAreaView>

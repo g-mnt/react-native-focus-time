@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {View, Text, StyleSheet, Vibration} from 'react-native'
 import { Countdown } from '../components/Countdown'
 import { fontSizes, spacing } from '../utils/sizes'
@@ -7,17 +7,37 @@ import { colors } from '../utils/colors'
 import { ProgressBar } from 'react-native-paper'
 import { Timing } from './Timing'
 
+const ONE_SECOND_IN_MS = 1000;
+
+const VIBRATION_PATTERN = [
+    1* ONE_SECOND_IN_MS,
+    1* ONE_SECOND_IN_MS,
+    1* ONE_SECOND_IN_MS,
+    1* ONE_SECOND_IN_MS,
+    1* ONE_SECOND_IN_MS
+];
+
 export const Timer = ({
     currentItem,
-    clearItem
+    clearItem,
+    addToHistory
 }) => {
-    const [isPaused, setIsPaused] = useState(true)
-    const [initialTime, setInitialTime] = useState(10)
-    const [progress, setProgress] = useState(initialTime)
-
+    const [isPaused, setIsPaused] = useState(true);
+    const [initialTime, setInitialTime] = useState(10);
+    const [progress, setProgress] = useState(1);
+    const [showControls, setShowControls] = useState(true);
+    
     const handleEnd = () => {
-        Vibration.vibrate();
-        clearItem();
+        Vibration.vibrate(VIBRATION_PATTERN);
+        addToHistory({title: currentItem, timeFocused: initialTime});
+    }
+
+    const handlePlay = () => {
+        setIsPaused((isPaused) => !isPaused);
+
+        if (showControls){
+            setShowControls(false);
+        }
     }
 
     return (
@@ -32,13 +52,20 @@ export const Timer = ({
             <View style={styles.progressBarContainer}>
                 <ProgressBar style={styles.progressBar} progress={progress} />
             </View>
-            <View style={[styles.buttonContainer, {flexDirection: isPaused ? 'row' : 'column'}]}>
-                <RoundedButton size={100} title={isPaused ? 'Start' : 'Stop'} onPress={() => {setIsPaused((isPaused) => !isPaused)}}/> 
+            
+            <View style={[styles.buttonContainer, {
+                flexDirection: isPaused ? 'row' : 'column',
+                flex: !showControls ? 0.6 : 0.2
+            }]}>
+                <RoundedButton size={100} title={isPaused ? 'Start' : 'Stop'} onPress={handlePlay} /> 
                 {isPaused && <RoundedButton size={100} title={'Cancel'} onPress={clearItem} />}
             </View>
-            <View style={styles.timeOptionsContainer}>
-                <Timing changeTime={setInitialTime}/>
-            </View>
+
+            {showControls &&
+                <View style={styles.timeOptionsContainer}>
+                    <Timing changeTime={setInitialTime} />
+                </View>
+            }    
         </View>
     )
 }
@@ -66,14 +93,14 @@ const styles = StyleSheet.create({
         color: colors.white
     },
     buttonContainer: {
-        flex:0.2,
+        flex: 0.2,
         margin: spacing.xxl,
         alignItems: 'center',
         justifyContent: 'center',
-        columnGap: 40
+        columnGap: 40,
     },
     progressBarContainer: {
-        paddingVertical: spacing.xxl,
+        paddingTop: spacing.xxl,
     },
     progressBar:{
         height: 9,

@@ -23,7 +23,6 @@ export const Focus = ({addItem}) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
     },
     inputContainer: {
         paddingVertical: spacing.xl,
